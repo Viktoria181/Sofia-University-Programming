@@ -12,8 +12,10 @@ const unsigned int MIN_SIZE = 6;
 const unsigned int MAX_SIZE = 30;
 const unsigned int MAX_SIZE_SQ = MAX_SIZE * MAX_SIZE;
 
-unsigned int SIZE = 8;
-unsigned int size_sq = SIZE * SIZE;
+unsigned int boardSize = 8;
+unsigned int boardSize_sq = boardSize * boardSize;
+
+unsigned int playerTurns = 0;
 
 bool program = true;
 bool game = false;
@@ -47,15 +49,15 @@ void resetIndices() {
 }
 
 int findIndex(int row, int col) {
-	return (row * SIZE + col);
+	return (row * boardSize + col);
 }
 
 int findCol(int index) {
-	return (index % SIZE);
+	return (index % boardSize);
 }
 
 int findRow(int index) {
-	return floor(index / SIZE);
+	return floor(index / boardSize);
 }
 
 bool isPlayerBetweenRookAndTarget(int rookIndex, int targetIndex) {
@@ -183,11 +185,11 @@ bool compassCollision(int indexA, int indexB) {
 }
 
 void generateRooks() {
-	indexRookA = rand() % size_sq;
-	indexRookB = rand() % size_sq;
+	indexRookA = rand() % boardSize_sq;
+	indexRookB = rand() % boardSize_sq;
 
 	while (indexRookA == indexRookB) {
-		indexRookB = rand() % size_sq;
+		indexRookB = rand() % boardSize_sq;
 
 		if (DEBUG) {
 			cout << "DEBUG: Reloading Rook" << endl;
@@ -196,10 +198,10 @@ void generateRooks() {
 }
 
 void generatePlayerKing() {
-	indexPlayerKing = rand() % size_sq;
+	indexPlayerKing = rand() % boardSize_sq;
 
 	while ((indexPlayerKing == indexRookA) || (indexPlayerKing == indexRookB)) {
-		indexPlayerKing = rand() % size_sq;
+		indexPlayerKing = rand() % boardSize_sq;
 
 		if (DEBUG) {
 			cout << "DEBUG: Reloading Player King" << endl;
@@ -210,7 +212,7 @@ void generatePlayerKing() {
 int getSafeBoardSize() {
 	unsigned int counter = 0;
 
-	for (int i = 0; i < size_sq; i++) {
+	for (int i = 0; i < boardSize_sq; i++) {
 		if (safeBoard[i] > 0) {
 			counter++;
 		}
@@ -223,7 +225,7 @@ void generateSafeZone()
 {
 	unsigned int counter = 0;
 
-	for (int i = 0; i < size_sq; i++) {
+	for (int i = 0; i < boardSize_sq; i++) {
 		if (board[i] != indexRookA && board[i] != indexRookB) {
 			if (!rookFlankCollision(indexRookA, board[i])) {
 				if (!rookFlankCollision(indexRookB, board[i])) {
@@ -249,7 +251,7 @@ void generateEnemyKing()
 
 void generateBoard()
 {
-	for (int i = 0; i < size_sq; i++) {
+	for (int i = 0; i < boardSize_sq; i++) {
 		board[i] = i;
 	}
 
@@ -265,7 +267,7 @@ void generateBoard()
 void displayColumnIndices()
 {
 	cout << endl << "   ";
-	for (int colInfo = 0; colInfo < SIZE; colInfo++) {
+	for (int colInfo = 0; colInfo < boardSize; colInfo++) {
 		if (colInfo < 10) {
 			cout << "   " << colInfo;
 		}
@@ -282,7 +284,7 @@ void displayColumnIndices()
 void displayUpperBorder()
 {
 	cout << "   ";
-	for (int upperBorder = 0; upperBorder < SIZE; upperBorder++) {
+	for (int upperBorder = 0; upperBorder < boardSize; upperBorder++) {
 		cout << "----";
 	}
 	cout << "-" << endl;
@@ -290,7 +292,7 @@ void displayUpperBorder()
 
 void displayBoard()
 {
-	for (int row = 0; row < SIZE; row++) {
+	for (int row = 0; row < boardSize; row++) {
 		if (row < 10) {
 			cout << row << "  ";
 		}
@@ -301,29 +303,29 @@ void displayBoard()
 			cout << row;
 		}
 
-		for (int c = 0; c < SIZE; c++) {
-			if (board[c + SIZE * row] == indexRookA) {
+		for (int c = 0; c < boardSize; c++) {
+			if (board[c + boardSize * row] == indexRookA) {
 				cout << "|  A";
 			}
-			else if (board[c + SIZE * row] == indexRookB) {
+			else if (board[c + boardSize * row] == indexRookB) {
 				cout << "|  B";
 			}
-			else if (board[c + SIZE * row] == indexPlayerKing) {
+			else if (board[c + boardSize * row] == indexPlayerKing) {
 				cout << "|  K";
 			}
-			else if (board[c + SIZE * row] == indexEnemyKing) {
+			else if (board[c + boardSize * row] == indexEnemyKing) {
 				cout << "|  E";
 			}
 			else {
 				if (SHOW_INDICES) {
-					if (board[c + SIZE * row] < 10) {
-						cout << "|  " << board[c + SIZE * row];
+					if (board[c + boardSize * row] < 10) {
+						cout << "|  " << board[c + boardSize * row];
 					}
-					else if (board[c + SIZE * row] < 100) {
-						cout << "| " << board[c + SIZE * row];
+					else if (board[c + boardSize * row] < 100) {
+						cout << "| " << board[c + boardSize * row];
 					}
 					else {
-						cout << "|" << board[c + SIZE * row];
+						cout << "|" << board[c + boardSize * row];
 					}
 				}
 				else {
@@ -334,7 +336,7 @@ void displayBoard()
 
 		cout << "|" << endl << "   ";
 
-		for (int horizontals = 0; horizontals < SIZE; horizontals++) {
+		for (int horizontals = 0; horizontals < boardSize; horizontals++) {
 			cout << "----";
 		}
 		cout << "-" << endl;
@@ -352,11 +354,11 @@ void display() {
 }
 
 bool boardOverflow(int targetRow, int targetCol) {
-	if ((targetRow < 0) || (targetRow > (SIZE - 1))) {
+	if ((targetRow < 0) || (targetRow > (boardSize - 1))) {
 		return true;
 	}
 
-	if ((targetCol < 0) || (targetCol > (SIZE - 1))) {
+	if ((targetCol < 0) || (targetCol > (boardSize - 1))) {
 		return true;
 	}
 
@@ -748,6 +750,7 @@ void logicEnemyKing() {
 
 	if (numSafeZones <= 0) {
 		cout << "\n\nCheckmate!\nGame Over.\nExiting...\n";
+		cout << "Player Turn: " << playerTurns << endl;
 		game = false;
 		return;
 	}
@@ -825,7 +828,7 @@ bool getPlayerMoveInput() {
 	cout << "select row: ";
 	cin >> row;
 	clearFailedInput();
-	if (row < 0 || row >= SIZE) {
+	if (row < 0 || row >= boardSize) {
 		cout << "\nInvalid row input\n";
 		return false;
 	}
@@ -833,7 +836,7 @@ bool getPlayerMoveInput() {
 	cout << "select column: ";
 	cin >> col;
 	clearFailedInput();
-	if (col < 0 || col >= SIZE) {
+	if (col < 0 || col >= boardSize) {
 		cout << "\nInvalid col input\n";
 		return false;
 	}
@@ -855,8 +858,8 @@ bool getBoardSizeInput()
 	clearFailedInput();
 
 	if (getSize >= MIN_SIZE && getSize <= MAX_SIZE) {
-		SIZE = getSize;
-		size_sq = SIZE * SIZE;
+		boardSize = getSize;
+		boardSize_sq = boardSize * boardSize;
 		return true;
 	}
 	else
@@ -875,6 +878,9 @@ void consoleSpace(int num) {
 void startGame() {
 	srand(time(NULL));
 	consoleSpace(3);
+
+	playerTurns = 0;
+
 	cout << "Game Start...\n";
 
 	initArray(board, MAX_SIZE_SQ, 0);
@@ -902,7 +908,7 @@ void gameMenu() {
 	}
 	else if (choice == 'D' || choice == 'd') {
 		if (getBoardSizeInput()) {
-			cout << "board size: " << SIZE << endl;
+			cout << "board size: " << boardSize << endl;
 			startGame();
 		}
 		else {
@@ -917,14 +923,8 @@ void gameMenu() {
 	}
 }
 
-void personalInfo() {
-	cout << "Victoria Petkova\n123456789\n";
-}
-
 int main() {
 	srand(time(NULL));
-
-	personalInfo();
 
 	gameMenu();
 
@@ -932,6 +932,7 @@ int main() {
 		if (game) {
 			if (getPlayerMoveInput()) {
 				cout << "\nPlayer move: \n";
+				playerTurns++;
 				display();
 
 				logicEnemyKing();
