@@ -3,11 +3,6 @@
 #include <stdlib.h>
 #include <ctime>
 
-#include <iostream>
-#include <cmath>
-#include <stdlib.h>
-#include <ctime>
-
 using namespace std;
 
 const bool SHOW_INDICES = false;
