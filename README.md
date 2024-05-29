@@ -1,8 +1,8 @@
-Chess Game in C++
+#Chess Game in C++
 
 This project is a simple implementation of a chess-like game in C++. It features a board with rooks (pieces labeled A and B) and a player king (piece labeled K), along with an enemy king (piece labeled E). The objective of the game is to maneuver the player king to capture the enemy king while avoiding potential threats from the enemy rooks.
 
-Features
+##Features
 Board size selection: Choose between different board sizes (minimum 6x6 and maximum 30x30).
 Randomized piece placement: The rooks and player king are randomly placed on the board at the start of each game.
 Movement validation: The game validates player moves to ensure they comply with chess rules and constraints.
